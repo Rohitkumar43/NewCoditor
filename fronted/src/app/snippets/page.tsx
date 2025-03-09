@@ -10,29 +10,42 @@
  * - Empty state handling
  */
 
-"use client"; // Marks this as a client-side component in Next.js
+"use client";
 
-import { useQuery } from "convex/react";
-import { api } from "../../../convex/_generated/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Snippet } from "@/types/index";
+import { snippetApi } from "@/services/snippetApi";
 import SnippetsPageSkeleton from "./_components/SnippetsPageSkeleton";
 import NavigationHeader from "@/Components/NavigationHeader";
-
 import { AnimatePresence, motion } from "framer-motion";
 import { BookOpen, Code, Grid, Layers, Search, Tag, X } from "lucide-react";
-import SnippetCard from "./_components/SnippetCard";    
+import SnippetCard from "./_components/nippetCard";
 
 function SnippetsPage() {
   // Fetch snippets data using Convex query
-  const snippets = useQuery(api.snippets.getSnippets);
-  
-  // State management for search, filtering, and view options
+  const [snippets, setSnippets] = useState<Snippet[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [view, setView] = useState<"grid" | "list">("grid");
 
+  useEffect(() => {
+    const fetchSnippets = async () => {
+      try {
+        const data = await snippetApi.getSnippets();
+        setSnippets(data);
+      } catch (error) {
+        console.error('Failed to fetch snippets:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSnippets();
+  }, []);
+
   // Show loading skeleton while data is being fetched
-  if (snippets === undefined) {
+  if (loading) {
     return (
       <div className="min-h-screen">
         <NavigationHeader />
@@ -41,12 +54,13 @@ function SnippetsPage() {
     );
   }
 
+
   // Extract unique languages and get the top 5 for quick filtering
   const languages = [...new Set(snippets.map((s) => s.language))];
   const popularLanguages = languages.slice(0, 5);
 
   // Filter snippets based on search query and selected language
-  const filteredSnippets = snippets.filter((snippet) => {
+  const filteredSnippets = snippets.filter((snippet: Snippet) => {
     const matchesSearch =
       snippet.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       snippet.language.toLowerCase().includes(searchQuery.toLowerCase()) ||

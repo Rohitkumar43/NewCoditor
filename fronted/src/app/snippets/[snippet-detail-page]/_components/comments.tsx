@@ -1,42 +1,47 @@
 import { SignInButton, useUser } from "@clerk/nextjs";
-import { Id } from "../../../../../convex/_generated/dataModel";
 import { useState } from "react";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "../../../../../convex/_generated/api";
 import toast from "react-hot-toast";
 import { MessageSquare } from "lucide-react";
-import Comment from "./Comment";
-import CommentForm from "./Commentform";
+import Comment from "./comment";
+import CommentForm from "./commentform";
+import { snippetApi } from "@/services/snippetApi";
+import { Comment as CommentType } from "@/types/index";
 
-function Comments({ snippetId }: { snippetId: Id<"snippets"> }) {
+interface CommentsProps {
+  snippetId: string;
+  initialComments: CommentType[];
+}
+
+function Comments({ snippetId, initialComments }: CommentsProps) {
   const { user } = useUser();
+  const [comments, setComments] = useState<CommentType[]>(initialComments);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [deletinCommentId, setDeletingCommentId] = useState<string | null>(null);
-
-  const comments = useQuery(api.snippets.getComments, { snippetId }) || [];
-  const addComment = useMutation(api.snippets.addComment);
-  const deleteComment = useMutation(api.snippets.deleteComment);
+  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
 
   const handleSubmitComment = async (content: string) => {
     setIsSubmitting(true);
 
     try {
-      await addComment({ snippetId, content });
+      const newComment = await snippetApi.addComment(snippetId, content);
+      setComments(prev => [...prev, newComment]);
+      toast.success("Comment added successfully");
     } catch (error) {
-      console.log("Error adding comment:", error);
+      console.error("Error adding comment:", error);
       toast.error("Something went wrong");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleDeleteComment = async (commentId: Id<"snippetComments">) => {
+  const handleDeleteComment = async (commentId: string) => {
     setDeletingCommentId(commentId);
 
     try {
-      await deleteComment({ commentId });
+      await snippetApi.deleteComment(commentId);
+      setComments(prev => prev.filter(comment => comment._id !== commentId));
+      toast.success("Comment deleted successfully");
     } catch (error) {
-      console.log("Error deleting comment:", error);
+      console.error("Error deleting comment:", error);
       toast.error("Something went wrong");
     } finally {
       setDeletingCommentId(null);
@@ -72,7 +77,7 @@ function Comments({ snippetId }: { snippetId: Id<"snippets"> }) {
               key={comment._id}
               comment={comment}
               onDelete={handleDeleteComment}
-              isDeleting={deletinCommentId === comment._id}
+              isDeleting={deletingCommentId === comment._id}
               currentUserId={user?.id}
             />
           ))}
@@ -81,4 +86,5 @@ function Comments({ snippetId }: { snippetId: Id<"snippets"> }) {
     </div>
   );
 }
+
 export default Comments;

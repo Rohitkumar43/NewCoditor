@@ -1,25 +1,40 @@
 "use client";
 import { useSelector } from 'react-redux';
-import { RootState } from '@/store';
+import { RootState } from '@/stores';
 import { useState } from "react";
-import { shareSnippet } from '@/services/api';
+import { setAuthToken, snippetApi } from '@/services/api';
 import { X } from "lucide-react";
 import toast from "react-hot-toast";
+import { useAuth } from '@clerk/nextjs';
 function ShareSnippetDialog({ onClose }: { onClose: () => void }) {
     const [title, setTitle] = useState("");
     const [isSharing, setIsSharing] = useState(false);
     const { language, code } = useSelector((state: RootState) => state.editor);
+    const { getToken } = useAuth();
   
     const handleShare = async (e: React.FormEvent) => {
       e.preventDefault();
+      if (!title.trim() || !code.trim()) {
+        toast.error("Please fill in all fields");
+        return;
+      }
+
       setIsSharing(true);
   
       try {
-        await shareSnippet(title, language, code);
+        const token = await getToken();
+        if (!token) {
+          toast.error("Please sign in to share snippets");
+          return;
+        }
+
+        setAuthToken(token);
+        await snippetApi.shareSnippet(title, language, code);
         onClose();
         toast.success("Snippet shared successfully");
-      } catch (error) {
-        toast.error("Error sharing snippet");
+      } catch (error: any) {
+        console.error('Share error:', error);
+        toast.error(error.response?.data?.error || "Error sharing snippet");
       } finally {
         setIsSharing(false);
       }

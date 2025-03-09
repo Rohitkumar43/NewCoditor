@@ -1,31 +1,49 @@
-import CodeBlock from "./CodeBlock";
+import { useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-function CommentContent({ content }: { content: string }) {
-  // regex
-  const parts = content.split(/(```[\w-]*\n[\s\S]*?\n```)/g);
+interface CommentContentProps {
+  content: string;
+}
+
+function CommentContent({ content }: CommentContentProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <div className="text-[#e1e1e3]">{content}</div>;
+  }
 
   return (
-    <div className="max-w-none text-white">
-      {parts.map((part, index) => {
-        if (part.startsWith("```")) {
-          //           ```javascript
-          // const name = "John";
-          // ```
-          const match = part.match(/```([\w-]*)\n([\s\S]*?)\n```/);
-
-          if (match) {
-            const [, language, code] = match;
-            return <CodeBlock language={language} code={code} key={index} />;
-          }
-        }
-
-        return part.split("\n").map((line, lineIdx) => (
-          <p key={lineIdx} className="mb-4 text-gray-300 last:mb-0">
-            {line}
-          </p>
-        ));
-      })}
-    </div>
+    <ReactMarkdown
+      className="text-[#e1e1e3] prose prose-invert max-w-none"
+      components={{
+        code({ node, inline, className, children, ...props }) {
+          const match = /language-(\w+)/.exec(className || '');
+          return !inline && match ? (
+            <SyntaxHighlighter
+              style={vscDarkPlus}
+              language={match[1]}
+              PreTag="div"
+              {...props}
+            >
+              {String(children).replace(/\n$/, '')}
+            </SyntaxHighlighter>
+          ) : (
+            <code className={className} {...props}>
+              {children}
+            </code>
+          );
+        },
+      }}
+    >
+      {content}
+    </ReactMarkdown>
   );
 }
+
 export default CommentContent;

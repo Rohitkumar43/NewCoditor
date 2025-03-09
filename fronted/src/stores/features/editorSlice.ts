@@ -9,7 +9,8 @@ interface EditorState {
   output: string;
   error: string;
   isRunning: boolean;
-  editor: editor.IStandaloneCodeEditor | null;
+  //editor: editor.IStandaloneCodeEditor | null;
+  isEditorReady: boolean;
 }
 
 const initialState: EditorState = {
@@ -20,7 +21,8 @@ const initialState: EditorState = {
   output: '',
   error: '',
   isRunning: false,
-  editor: null
+  isEditorReady: false
+  //editor: null
 };
 
 export const editorSlice = createSlice({
@@ -50,8 +52,11 @@ export const editorSlice = createSlice({
     setIsRunning: (state, action: PayloadAction<boolean>) => {
       state.isRunning = action.payload;
     },
-    setEditor: (state, action: PayloadAction<editor.IStandaloneCodeEditor>) => {
-      state.editor = action.payload;
+    // setEditor: (state, action: PayloadAction<editor.IStandaloneCodeEditor>) => {
+    //   state.editor = action.payload;
+    // }
+    setEditorReady: (state, action: PayloadAction<boolean>) => {
+      state.isEditorReady = action.payload;
     }
   }
 });
@@ -64,7 +69,7 @@ export const {
   setOutput,
   setError,
   setIsRunning,
-  setEditor
+  setEditorReady
 } = editorSlice.actions;
 
 export default editorSlice.reducer;

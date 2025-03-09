@@ -1,4 +1,4 @@
-"use client";
+
 
 /**
  * This code implements a feature-rich code editor panel using Monaco Editor.
@@ -9,14 +9,15 @@
  * It ensures the editor is only loaded for authenticated users and provides
  * user context for features like code sharing and persistence.
  */
-
+"use client";
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
-import { setCode, setEditor } from '@/stores/features/editorSlice';
-import { useEffect, useState } from "react";
+import { setCode, setEditorReady } from '@/stores/features/editorSlice';
+import { useEffect, useState , useRef} from "react";
 import { defineMonacoThemes, LANGUAGE_CONFIG } from "../_constant";
 import { Editor } from "@monaco-editor/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import {editor} from 'monaco-editor';
 import { RotateCcwIcon, ShareIcon, TypeIcon } from "lucide-react";
 import { useClerk } from "@clerk/nextjs";
 import { EditorPanelSkeleton } from "./EditorPanelSkeleton";
@@ -26,15 +27,25 @@ function EditorPanel() {
   const dispatch = useAppDispatch();
   const { language, theme, fontSize } = useAppSelector(state => state.editor);
   const clerk = useClerk();
-  
-  // Single declaration of state
+   
+  // add editor ref 
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+// Single declaration of state
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  // Add state for initial code
+  const [initialCode, setInitialCode] = useState(LANGUAGE_CONFIG[language].defaultCode);
 
-  // Load saved code from localStorage when language changes
-  useEffect(() => {
+
+   // Load saved code from localStorage when language changes
+   useEffect(() => {
     const savedCode = localStorage.getItem(`editor-code-${language}`);
-    const newCode = savedCode || LANGUAGE_CONFIG[language].defaultCode;
-    dispatch(setCode(newCode));
+    if (savedCode) {
+      setInitialCode(savedCode);
+      dispatch(setCode(savedCode));
+    } else {
+      setInitialCode(LANGUAGE_CONFIG[language].defaultCode);
+      dispatch(setCode(LANGUAGE_CONFIG[language].defaultCode));
+    }
   }, [language, dispatch]);
 
   // Handler to reset code to default for current language
@@ -58,7 +69,14 @@ function EditorPanel() {
     localStorage.setItem("editor-font-size", size.toString());
   };
 
+  // Handle editor mounting
+  const handleEditorMount = (editor: editor.IStandaloneCodeEditor) => {
+    editorRef.current = editor;
+    dispatch(setEditorReady(true));
+  };
+
   if (!clerk.loaded) return <EditorPanelSkeleton />;
+
 
   return (
     <div className="relative">
@@ -126,11 +144,12 @@ function EditorPanel() {
           <Editor
             height="600px"
             language={LANGUAGE_CONFIG[language].monacoLanguage}
-            value={LANGUAGE_CONFIG[language].defaultCode}
+            // value={initialCode} {/* Use initialCode instead of directly accessing localStorage */}
+            value={initialCode}
             onChange={handleEditorChange}
             theme={theme}
             beforeMount={defineMonacoThemes}
-            onMount={(editor) => dispatch(setEditor(editor))}
+            onMount={handleEditorMount}
             options={{
               minimap: { enabled: false },
               fontSize,

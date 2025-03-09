@@ -3,15 +3,18 @@
 import { Request, Response, NextFunction } from 'express';
 import { clerkClient } from '@clerk/clerk-sdk-node';
 
-// Add this interface to extend the Express Request type
-interface AuthenticatedRequest extends Request {
+// Define a shared interface for authenticated requests
+export interface AuthRequest extends Request {
+  auth: { userId: string };
   user?: {
     userId: string;
+    name: string;
+    email: string;
   };
 }
 
 export const requireAuth = async (
-  req: AuthenticatedRequest, 
+  req: AuthRequest, 
   res: Response, 
   next: NextFunction
 ): Promise<void> => {
@@ -19,19 +22,27 @@ export const requireAuth = async (
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
       res.status(401).json({ error: 'No token provided' });
-      return; // Return void instead of returning the response
+      return;
     }
 
     const session = await clerkClient.sessions.verifySession(token, token);
     if (!session) {
       res.status(401).json({ error: 'Invalid token' });
-      return; // Return void instead of returning the response
+      return;
     }
 
-    req.user = { userId: session.userId };
+    const user = await clerkClient.users.getUser(session.userId);
+    
+    req.auth = { userId: session.userId };
+    req.user = {
+      userId: session.userId,
+      name: `${user.firstName} ${user.lastName}`.trim(),
+      email: user.emailAddresses[0]?.emailAddress || ''
+    };
+
     next();
   } catch (error) {
     res.status(401).json({ error: 'Authentication failed' });
-    return; // Return void instead of returning the response
+    return;
   }
 };

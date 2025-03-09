@@ -1,28 +1,28 @@
 import axios from 'axios';
-import { useAuth } from '@clerk/nextjs';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 });
 
 
-export const executeCode = async (code: string, language: string) => {
-  const response = await api.post('/code/execute', { code, language });
-  return response.data;
-};
-
-export const shareSnippet = async (title: string, language: string, code: string) => {
-  const response = await api.post('/snippets', { title, language, code });
-  return response.data;
-};
-
-api.interceptors.request.use(async (config) => {
-  const { getToken } = useAuth();
-  const token = await getToken();
+// Create a function to set the auth token
+export const setAuthToken = (token: string | null) => {
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete api.defaults.headers.common['Authorization'];
   }
-  return config;
-});
+};
 
+export const snippetApi = {
+  shareSnippet: async (title: string, language: string, code: string) => {
+    const response = await api.post('/snippets', { 
+      title, 
+      language, 
+      code 
+    });
+    return response.data;
+  },
+  // ... other api methods
+};
 export default api;

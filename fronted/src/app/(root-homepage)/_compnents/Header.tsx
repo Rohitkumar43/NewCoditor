@@ -10,7 +10,7 @@ import RunButton from "./RunButton";
 import HeaderProfileBtn from "./HeaderProfileBtn";
 import { SignedIn, useUser } from '@clerk/nextjs';
 
-async function Header() {
+function Header() {
     const { isPro } = useSelector((state: RootState) => state.user);
     const {user} = useUser();
 
@@ -72,7 +72,7 @@ async function Header() {
         <div className="flex items-center gap-4">
         <div className="flex items-center gap-3">
       <ThemeSelector />
-      <LanguageSelector hasAccess={Boolean(user?.isPro || isPro)} />
+      <LanguageSelector hasAccess={isPro} />
     </div>
 
           <div>

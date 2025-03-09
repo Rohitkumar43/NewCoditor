@@ -1,37 +1,70 @@
-import { useAuth } from "@clerk/nextjs";
-import { Id } from "../../convex/_generated/dataModel";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+"use client";
+
+import { useState, useEffect } from "react";
 import { Star } from "lucide-react";
+import { snippetApi } from "@/services/snippetApi";
+import { useAuth } from "@clerk/nextjs";
 
-function StarButton({ snippetId }: { snippetId: Id<"snippets"> }) {
-  const { isSignedIn } = useAuth();
+interface StarButtonProps {
+  snippetId: string;
+}
 
-  const isStarred = useQuery(api.snippets.isSnippetStarred, { snippetId });
-  const starCount = useQuery(api.snippets.getSnippetStarCount, { snippetId });
-  const star = useMutation(api.snippets.starSnippet);
+function StarButton({ snippetId }: StarButtonProps) {
+  const { userId } = useAuth();
+  const [isStarred, setIsStarred] = useState(false);
+  const [starCount, setStarCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchStarStatus = async () => {
+      try {
+        const [starred, count] = await Promise.all([
+          snippetApi.isSnippetStarred(snippetId),
+          snippetApi.getSnippetStarCount(snippetId)
+        ]);
+        setIsStarred(starred);
+        setStarCount(count);
+      } catch (error) {
+        console.error("Error fetching star status:", error);
+      }
+    };
+
+    if (userId) {
+      fetchStarStatus();
+    }
+  }, [snippetId, userId]);
 
   const handleStar = async () => {
-    if (!isSignedIn) return;
-    await star({ snippetId });
+    if (!userId) return;
+    setIsLoading(true);
+
+    try {
+      await snippetApi.starSnippet(snippetId);
+      setIsStarred(!isStarred);
+      setStarCount(prev => isStarred ? prev - 1 : prev + 1);
+    } catch (error) {
+      console.error("Error starring snippet:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <button
-      className={`group flex items-center gap-1.5 px-3 py-1.5 rounded-lg 
-    transition-all duration-200 ${
-      isStarred
-        ? "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20"
-        : "bg-gray-500/10 text-gray-400 hover:bg-gray-500/20"
-    }`}
       onClick={handleStar}
+      disabled={isLoading || !userId}
+      className={`group flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all duration-200
+        ${isStarred
+          ? "bg-yellow-500/20 text-yellow-400"
+          : "bg-gray-500/10 text-gray-400 hover:bg-yellow-500/10 hover:text-yellow-400"
+        }`}
     >
-      <Star
-        className={`w-4 h-4 ${isStarred ? "fill-yellow-500" : "fill-none group-hover:fill-gray-400"}`}
-      />
-      <span className={`text-xs font-medium ${isStarred ? "text-yellow-500" : "text-gray-400"}`}>
-        {starCount}
-      </span>
+      {isLoading ? (
+        <div className="size-3.5 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin" />
+      ) : (
+        <Star className={`size-3.5 ${isStarred ? "fill-yellow-400" : ""}`} />
+      )}
+      <span className="text-xs font-medium">{starCount}</span>
     </button>
   );
 }

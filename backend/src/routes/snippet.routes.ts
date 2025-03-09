@@ -1,8 +1,8 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { snippetController } from '../controller/snippet.controller';
-import { requireAuth, attachUser } from '../middleware/auth.authMiddleware';
+import { requireAuth } from '../middleware/auth.authMiddleware';
 
-const router = express.Router();
+const router: Router = express.Router();
 
 // Public routes
 router.get('/', snippetController.getSnippets);
@@ -11,8 +11,9 @@ router.get('/:snippetId/stars/count', snippetController.getSnippetStarCount);
 
 // Protected routes
 router.use(requireAuth);
-router.use(attachUser);
+// Remove attachUser as it's now handled in requireAuth
 
+// Protected endpoints
 router.post('/', snippetController.createSnippet);
 router.delete('/:snippetId', snippetController.deleteSnippet);
 router.post('/:snippetId/star', snippetController.starSnippet);

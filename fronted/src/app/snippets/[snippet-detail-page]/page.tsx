@@ -1,34 +1,51 @@
 "use client";
 
-import { useQuery } from "convex/react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { api } from "../../../../convex/_generated/api";
-import { Id } from "../../../../convex/_generated/dataModel";
+import { snippetApi } from "@/services/snippetApi";
+import { Snippet } from "@/types/index";
 import SnippetLoadingSkeleton from "./_components/SnippetLoadingSkeleton";
 import NavigationHeader from "@/Components/NavigationHeader";
 import { Clock, Code, MessageSquare, User } from "lucide-react";
 import { Editor } from "@monaco-editor/react";
 import { defineMonacoThemes, LANGUAGE_CONFIG } from "@/app/(root-homepage)/_constant";
 import CopyButton from "./_components/CopyButton";
-import Comments from "./_components/Comments";
+import Comments from "./_components/comments";
+import toast from "react-hot-toast";
 
 function SnippetDetailPage() {
     const params = useParams();
-    const snippetId = params?.['snippet-detail-page'] as Id<"snippets">;
+    const snippetId = params?.['snippet-id'] as string;
+    const [snippet, setSnippet] = useState<Snippet | null>(null);
+    const [comments, setComments] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const snippet = useQuery(api.snippets.getSnippetById, {
-        snippetId: snippetId
-    });
+    useEffect(() => {
+        const fetchSnippetData = async () => {
+            try {
+                const [snippetData, commentsData] = await Promise.all([
+                    snippetApi.getSnippetById(snippetId),
+                    snippetApi.getSnippetComments(snippetId)
+                ]);
+                setSnippet(snippetData);
+                setComments(commentsData);
+            } catch (err) {
+                setError("Failed to load snippet");
+                toast.error("Failed to load snippet");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const comments = useQuery(api.snippets.getComments, {
-        snippetId: snippetId
-    });
+        fetchSnippetData();
+    }, [snippetId]);
 
-    if (snippet === undefined) {
+    if (loading) {
         return <SnippetLoadingSkeleton />;
     }
 
-    if (snippet === null) {
+    if (error || !snippet) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-[#0a0a0f]">
                 <div className="text-center">
@@ -71,11 +88,11 @@ function SnippetDetailPage() {
                                         </div>
                                         <div className="flex items-center gap-2 text-[#8b8b8d]">
                                             <Clock className="w-4 h-4" />
-                                            <span>{new Date(snippet._creationTime).toLocaleDateString()}</span>
+                                            <span>{new Date(snippet.createdAt).toLocaleDateString()}</span>
                                         </div>
                                         <div className="flex items-center gap-2 text-[#8b8b8d]">
                                             <MessageSquare className="w-4 h-4" />
-                                            <span>{comments?.length || 0} comments</span>
+                                            <span>{comments.length} comments</span>
                                         </div>
                                     </div>
                                 </div>
@@ -116,7 +133,11 @@ function SnippetDetailPage() {
                     </div>
 
                     {/* Comments Section */}
-                    <Comments snippetId={snippet._id} />
+                    <Comments 
+                        snippetId={snippet._id} 
+                        comments={comments}
+                        onCommentAdded={(newComment) => setComments(prev => [...prev, newComment])}
+                    />
                 </div>
             </main>
         </div>

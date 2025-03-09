@@ -4,7 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 import userRoutes from './routes/user.routes';
-// import snippetRoutes from './routes/snippet.routes';
+import snippetRoutes from './routes/snippet.routes';
 // import codeExecutionRoutes from './routes/codeExecution';
 // import commentRoutes from './routes/comment.routes';
 
@@ -17,9 +17,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
+// Test route
+app.get('/api/test', (_req, res) => {
+  res.json({ message: 'API is working' });
+});
+
 // Routes
 app.use('/api/users', userRoutes);
-// app.use('/api/snippets', snippetRoutes);
+ app.use('/api/snippets', snippetRoutes);
 // app.use('/api/comments', commentRoutes);
 // app.use('/api/code', codeExecutionRoutes);
 

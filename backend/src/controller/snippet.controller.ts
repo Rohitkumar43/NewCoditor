@@ -1,18 +1,36 @@
 import { Request, Response } from 'express';
 import { Snippet } from '../models/snippet.model';
-import { Comment } from '../models/snippetComment.model';
+import { SnippetComment } from '../models/snippetComment.model';
 import { Star } from '../models/star.model';
+import { AuthRequest } from '../middleware/auth.authMiddleware';
 
-interface AuthRequest extends Request {
-  auth: { userId: string };
-  user?: any;
-}
+
+
+// interface AuthRequest extends Request {
+//   auth: { userId: string };
+//   user?: {
+//     id: string;
+//     name: string;
+//     email: string;
+//   };
+// }
 
 export const snippetController = {
   // Create snippet
   createSnippet: async (req: AuthRequest, res: Response) => {
     try {
       const { title, language, code } = req.body;
+
+      // Add input validation
+      if (!title?.trim() || !language?.trim() || !code?.trim()) {
+        return res.status(400).json({ error: 'All fields are required' });
+      }
+
+      // Add user validation
+      if (!req.auth?.userId || !req.user?.name) {
+        return res.status(401).json({ error: 'User authentication required' });
+      }
+
       const snippet = await Snippet.create({
         userId: req.auth.userId,
         userName: req.user.name,
@@ -20,12 +38,13 @@ export const snippetController = {
         language,
         code
       });
+
       res.status(201).json(snippet);
     } catch (error) {
+      console.error('Create snippet error:', error);
       res.status(500).json({ error: 'Failed to create snippet' });
     }
   },
-
   // Delete snippet and related data
   deleteSnippet: async (req: AuthRequest, res: Response) => {
     try {
@@ -39,7 +58,7 @@ export const snippetController = {
       }
 
       // Delete related comments and stars
-      await Comment.deleteMany({ snippetId: req.params.snippetId });
+      await SnippetComment.deleteMany({ snippetId: req.params.snippetId });
       await Star.deleteMany({ snippetId: req.params.snippetId });
       await snippet.deleteOne();
 
