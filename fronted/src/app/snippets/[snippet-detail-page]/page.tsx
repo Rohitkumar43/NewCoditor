@@ -23,6 +23,7 @@ function SnippetDetailPage() {
 
     useEffect(() => {
         const fetchSnippetData = async () => {
+            // try catch
             try {
                 const [snippetData, commentsData] = await Promise.all([
                     snippetApi.getSnippetById(snippetId),
