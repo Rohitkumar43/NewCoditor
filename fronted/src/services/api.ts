@@ -1,7 +1,7 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api'
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 });
 
 
@@ -24,10 +24,6 @@ export const setAuthToken = (token: string | null) => {
 };
 
 
-
-
-
-
 export const snippetApi = {
   shareSnippet: async (title: string, language: string, code: string) => {
     const response = await api.post('/snippets', { 
@@ -39,4 +35,39 @@ export const snippetApi = {
   },
   // ... other api methods
 };
+
+
+interface ExecuteCodeParams {
+  code: string;
+  language: string;
+}
+
+// export const executeCode = async ({ code, language }: ExecuteCodeParams): Promise<AxiosResponse<any, any>> => {
+//   return axios.post('/execute', { code, language });
+// };
+
+// export const executeCode = async ({ code, language }: ExecuteCodeParams) => {
+//   const response = await axios.post('http://localhost:5000/api/execute', {
+//     code,
+//     language
+//   });
+//   return response;
+// };
+
+
+export const executeCode = async ({ code, language }: ExecuteCodeParams) => {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  
+  const response = await axios.post(`${API_URL}/api/execute`, {
+    code,
+    language
+  });
+  return response;
+};
+
+
+
+
+
+
 export default api;

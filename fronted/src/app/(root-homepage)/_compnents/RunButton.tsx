@@ -67,8 +67,9 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/stores';
 import { setIsRunning, setOutput, setError } from '@/stores/features/editorSlice';
-import { executeCode } from '@/services/api';
+//import  executeCode  from '@/services/api';
 import { PlayIcon } from 'lucide-react';
+import { executeCode } from '@/services/api';
 
 function RunButton() {
   const dispatch = useDispatch();
@@ -76,11 +77,17 @@ function RunButton() {
 
   const handleRun = async () => {
     try {
-      dispatch(setIsRunning(true));
-      const result = await executeCode(code, language);
-      dispatch(setOutput(result.output));
+      dispatch(setIsRunning(true));{}
+      const result = await executeCode({code, language});
+      dispatch(setOutput(result.data.output));
+      dispatch(setIsRunning(false));
     } catch (error) {
-      dispatch(setError(error.message));
+      dispatch(setIsRunning(false));
+      if (error instanceof Error) {
+        dispatch(setError(error.message));
+      } else {
+        dispatch(setError('An unknown error occurred'));
+      }
     }
   };
 
