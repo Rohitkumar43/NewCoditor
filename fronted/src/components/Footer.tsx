@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Blocks, Code2, GitBranch, Terminal, Coffee } from "lucide-react";
 import Link from "next/link";
 
@@ -6,6 +7,18 @@ function Footer() {
     <footer className="relative border-t border-gray-800/50 mt-auto">
       <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-gray-900 to-transparent" />
       <div className="max-w-7xl mx-auto px-6 py-12">
+=======
+import { Blocks, Code2, GitBranch, Terminal, Coffee, Github, Twitter, Linkedin, Heart, ExternalLink } from "lucide-react";
+import Link from "next/link";
+
+function Footer() {
+  const currentYear = new Date().getFullYear();
+  
+  return (
+    <footer className="relative border-t border-gray-800/50 mt-auto bg-[#0a0a0a]">
+      <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-gray-900 to-transparent" />
+      <div className="max-w-7xl mx-auto px-6 py-8">
+>>>>>>> 1aa82f4 (make the change in the price page)
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-4 text-gray-400">
@@ -27,31 +40,82 @@ function Footer() {
             <div className="flex items-center gap-8">
               <Link 
                 href="/support" 
+<<<<<<< HEAD
                 className="text-gray-400 hover:text-gray-300 transition-colors text-base"
               >
+=======
+                className="text-gray-400 hover:text-gray-300 transition-colors text-base flex items-center gap-1"
+              >
+                <ExternalLink className="size-4" />
+>>>>>>> 1aa82f4 (make the change in the price page)
                 Support
               </Link>
               <Link 
                 href="/docs" 
+<<<<<<< HEAD
                 className="text-gray-400 hover:text-gray-300 transition-colors text-base"
               >
+=======
+                className="text-gray-400 hover:text-gray-300 transition-colors text-base flex items-center gap-1"
+              >
+                <ExternalLink className="size-4" />
+>>>>>>> 1aa82f4 (make the change in the price page)
                 Docs
               </Link>
               <Link 
                 href="/privacy" 
+<<<<<<< HEAD
                 className="text-gray-400 hover:text-gray-300 transition-colors text-base"
               >
+=======
+                className="text-gray-400 hover:text-gray-300 transition-colors text-base flex items-center gap-1"
+              >
+                <ExternalLink className="size-4" />
+>>>>>>> 1aa82f4 (make the change in the price page)
                 Privacy
               </Link>
               <Link 
                 href="/terms" 
+<<<<<<< HEAD
                 className="text-gray-400 hover:text-gray-300 transition-colors text-base"
               >
+=======
+                className="text-gray-400 hover:text-gray-300 transition-colors text-base flex items-center gap-1"
+              >
+                <ExternalLink className="size-4" />
+>>>>>>> 1aa82f4 (make the change in the price page)
                 Terms
               </Link>
             </div>
           </div>
         </div>
+<<<<<<< HEAD
+=======
+        
+        <div className="mt-8 pt-8 border-t border-gray-800/50 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="text-gray-500 text-sm">
+            {currentYear} Coditor. All rights reserved.
+          </div>
+          
+          <div className="flex items-center gap-6">
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-300 transition-colors">
+              <Github className="size-5" />
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-300 transition-colors">
+              <Twitter className="size-5" />
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-300 transition-colors">
+              <Linkedin className="size-5" />
+            </a>
+          </div>
+          
+          <div className="flex items-center gap-2 text-gray-500 text-sm">
+            <span>Made with</span>
+            <Heart className="size-4 text-red-500" fill="#ef4444" />
+            <span>in India</span>
+          </div>
+        </div>
+>>>>>>> 1aa82f4 (make the change in the price page)
       </div>
     </footer>
   );

@@ -4,6 +4,10 @@ import { useState, useEffect } from "react";
 import { Star } from "lucide-react";
 import { snippetApi } from "@/services/snippetApi";
 import { useAuth } from "@clerk/nextjs";
+<<<<<<< HEAD
+=======
+import toast from "react-hot-toast";
+>>>>>>> 1aa82f4 (make the change in the price page)
 
 interface StarButtonProps {
   snippetId: string;
@@ -29,11 +33,16 @@ function StarButton({ snippetId }: StarButtonProps) {
       }
     };
 
+<<<<<<< HEAD
     if (userId) {
+=======
+    if (userId && snippetId) {
+>>>>>>> 1aa82f4 (make the change in the price page)
       fetchStarStatus();
     }
   }, [snippetId, userId]);
 
+<<<<<<< HEAD
   const handleStar = async () => {
     if (!userId) return;
     setIsLoading(true);
@@ -42,6 +51,24 @@ function StarButton({ snippetId }: StarButtonProps) {
       await snippetApi.starSnippet(snippetId);
       setIsStarred(!isStarred);
       setStarCount(prev => isStarred ? prev - 1 : prev + 1);
+=======
+  const handleStar = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!userId) {
+      toast.error("Please sign in to star snippets");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const success = await snippetApi.starSnippet(snippetId);
+      if (success) {
+        setIsStarred(!isStarred);
+        setStarCount(prev => isStarred ? prev - 1 : prev + 1);
+      }
+>>>>>>> 1aa82f4 (make the change in the price page)
     } catch (error) {
       console.error("Error starring snippet:", error);
     } finally {

@@ -4,9 +4,15 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from './providers';
 import { ClerkProvider } from "@clerk/nextjs";
+<<<<<<< HEAD
 // //import ConvexClientProvider from "@/Components/providers/ConvexClientProvider";
 // import Footer from "@/Components/Footer";
 // import { Toaster } from "react-hot-toast";
+=======
+import { Toaster } from 'react-hot-toast';
+import UserDataSync from '@/components/UserDataSync';
+import Footer from "@/components/Footer";
+>>>>>>> 1aa82f4 (make the change in the price page)
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,6 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+<<<<<<< HEAD
     <html lang="en">
       <ClerkProvider>
       <body>
@@ -38,5 +45,21 @@ export default function RootLayout({
         </body>
       </ClerkProvider>
     </html>
+=======
+    <ClerkProvider>
+      <html lang="en">
+        <body className="min-h-screen flex flex-col">
+          <UserDataSync />
+          <Toaster />
+          <Providers>
+            <div className="flex-1 flex flex-col">
+              {children}
+            </div>
+            <Footer />
+          </Providers>
+        </body>
+      </html>
+    </ClerkProvider>
+>>>>>>> 1aa82f4 (make the change in the price page)
   );
 }

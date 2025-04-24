@@ -2,10 +2,18 @@
 import { useSelector } from 'react-redux';
 import { RootState } from '@/stores';
 import { useState } from "react";
+<<<<<<< HEAD
 import { setAuthToken, snippetApi } from '@/services/api';
 import { X } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from '@clerk/nextjs';
+=======
+import { snippetApi } from '@/services/api';
+import { X } from "lucide-react";
+import toast from "react-hot-toast";
+import { useAuth } from '@clerk/nextjs';
+
+>>>>>>> 1aa82f4 (make the change in the price page)
 function ShareSnippetDialog({ onClose }: { onClose: () => void }) {
     const [title, setTitle] = useState("");
     const [isSharing, setIsSharing] = useState(false);
@@ -28,7 +36,10 @@ function ShareSnippetDialog({ onClose }: { onClose: () => void }) {
           return;
         }
 
+<<<<<<< HEAD
         setAuthToken(token);
+=======
+>>>>>>> 1aa82f4 (make the change in the price page)
         await snippetApi.shareSnippet(title, language, code);
         onClose();
         toast.success("Snippet shared successfully");
@@ -88,4 +99,8 @@ function ShareSnippetDialog({ onClose }: { onClose: () => void }) {
     </div>
   );
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1aa82f4 (make the change in the price page)
 export default ShareSnippetDialog;

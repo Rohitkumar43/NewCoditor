@@ -5,7 +5,12 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
+<<<<<<< HEAD
     "start": "node dist/index.js"
+=======
+    "start": "node dist/index.js",
+    "fix-indexes": "ts-node src/scripts/fixUserIndexes.ts"
+>>>>>>> 1aa82f4 (make the change in the price page)
   },
   "keywords": [],
   "author": "",
@@ -14,7 +19,11 @@
   "dependencies": {
     "@clerk/clerk-sdk-node": "^5.1.6",
     "@types/node": "^22.13.9",
+<<<<<<< HEAD
     "axios": "^1.8.1",
+=======
+    "axios": "^1.8.4",
+>>>>>>> 1aa82f4 (make the change in the price page)
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",

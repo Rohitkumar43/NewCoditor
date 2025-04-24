@@ -15,7 +15,7 @@ export default function Navbar() {
           {/* Logo and brand */}
           <Link href="/" className="flex items-center space-x-3">
             <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Coditor
+              Coditorr
             </span>
           </Link>
 

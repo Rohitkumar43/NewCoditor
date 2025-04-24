@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
+<<<<<<< HEAD
 import { User } from '../models/user.model';
+=======
+import User from '../models/User';
+>>>>>>> 1aa82f4 (make the change in the price page)
 import { Webhook } from 'svix';
 
 export const webhookController = {

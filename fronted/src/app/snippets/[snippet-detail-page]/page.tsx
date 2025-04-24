@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { snippetApi } from "@/services/snippetApi";
+<<<<<<< HEAD
 import { Snippet } from "@/types/index";
+=======
+import { Snippet, Comment } from "@/types/index";
+>>>>>>> 1aa82f4 (make the change in the price page)
 import SnippetLoadingSkeleton from "./_components/SnippetLoadingSkeleton";
 import NavigationHeader from "@/Components/NavigationHeader";
 import { Clock, Code, MessageSquare, User } from "lucide-react";
@@ -15,6 +19,7 @@ import toast from "react-hot-toast";
 
 function SnippetDetailPage() {
     const params = useParams();
+<<<<<<< HEAD
     const snippetId = params?.['snippet-id'] as string;
     const [snippet, setSnippet] = useState<Snippet | null>(null);
     const [comments, setComments] = useState<any[]>([]);
@@ -47,15 +52,215 @@ function SnippetDetailPage() {
     }
 
     if (error || !snippet) {
+=======
+    console.log("URL params:", params); // Debug the params object
+    
+    // Try all possible parameter names that Next.js might use
+    let snippetId = '';
+    if (params) {
+        // Check all possible parameter names
+        if ('snippet-detail-page' in params) {
+            const value = params['snippet-detail-page'];
+            snippetId = typeof value === 'string' ? value : Array.isArray(value) ? value[0] : '';
+        } else if ('snippetDetailPage' in params) {
+            const value = params.snippetDetailPage;
+            snippetId = typeof value === 'string' ? value : Array.isArray(value) ? value[0] : '';
+        }
+    }
+    
+    console.log("Extracted snippet ID:", snippetId);
+    
+    const [snippet, setSnippet] = useState<Snippet | null>(null);
+    const [comments, setComments] = useState<Comment[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [apiTimeout, setApiTimeout] = useState(false);
+    
+    useEffect(() => {
+        // Set a timeout to show a fallback UI if the API doesn't respond in time
+        const timeoutId = setTimeout(() => {
+            if (loading) {
+                console.log("API request timed out after 15 seconds");
+                setApiTimeout(true);
+            }
+        }, 15000); // 15 seconds timeout
+        
+        const fetchSnippetData = async () => {
+            console.log("Starting fetchSnippetData function with snippetId:", snippetId);
+            setLoading(true);
+            setError(null);
+            
+            // try catch
+            try {
+                // Check if snippetId is valid before making API calls
+                if (!snippetId || snippetId === 'undefined') {
+                    console.error("Invalid snippet ID detected:", snippetId);
+                    setError("Invalid snippet ID");
+                    toast.error("Invalid snippet ID");
+                    setLoading(false);
+                    return;
+                }
+                
+                console.log("Making API calls for snippet ID:", snippetId);
+                
+                // Make API calls one by one to better track where the issue might be
+                try {
+                    console.log("Fetching snippet data...");
+                    const snippetData = await snippetApi.getSnippetById(snippetId);
+                    console.log("Snippet data response received:", !!snippetData);
+                    
+                    if (!snippetData) {
+                        console.error("Snippet data is null or undefined");
+                        setError("Snippet not found");
+                        setLoading(false);
+                        return;
+                    }
+                    
+                    console.log("Setting snippet state with data:", snippetData);
+                    setSnippet(snippetData);
+                    
+                    console.log("Fetching comments data...");
+                    const commentsData = await snippetApi.getSnippetComments(snippetId);
+                    console.log("Comments data response received:", commentsData);
+                    
+                    setComments(commentsData);
+                    setError(null); // Clear any previous errors
+                    console.log("Data fetching completed successfully");
+                } catch (innerErr) {
+                    console.error("Error in API calls:", innerErr);
+                    throw innerErr; // Re-throw to be caught by the outer catch
+                }
+            } catch (err) {
+                console.error("Error loading snippet:", err);
+                setError("Failed to load snippet");
+                toast.error("Failed to load snippet");
+            } finally {
+                console.log("Setting loading state to false");
+                setLoading(false);
+                clearTimeout(timeoutId); // Clear the timeout since we got a response
+            }
+        };
+
+        if (snippetId) {
+            fetchSnippetData();
+        } else {
+            console.warn("No snippet ID available, skipping data fetch");
+            setLoading(false);
+            clearTimeout(timeoutId);
+        }
+        
+        // Cleanup function to clear the timeout if the component unmounts
+        return () => clearTimeout(timeoutId);
+    }, [snippetId]);
+
+    console.log("Current component state:", { loading, error, hasSnippet: !!snippet, apiTimeout });
+
+    // Show a fallback UI if the API request times out
+    if (apiTimeout) {
+>>>>>>> 1aa82f4 (make the change in the price page)
         return (
             <div className="flex items-center justify-center min-h-screen bg-[#0a0a0f]">
                 <div className="text-center">
                     <h2 className="text-2xl font-semibold text-white mb-2">
+<<<<<<< HEAD
                         Snippet Not Found
                     </h2>
                     <p className="text-gray-400">
                         The requested snippet could not be found.
                     </p>
+=======
+                        Backend Server Not Responding
+                    </h2>
+                    <p className="text-gray-400 mb-6">
+                        The backend server is taking too long to respond. This could be because:
+                    </p>
+                    <ul className="text-left text-gray-400 mb-6 max-w-md mx-auto">
+                        <li className="mb-2">• The backend server is not running</li>
+                        <li className="mb-2">• The server is experiencing high load</li>
+                        <li className="mb-2">• There's a network issue</li>
+                    </ul>
+                    <div>
+                        <button 
+                            onClick={() => window.location.reload()}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                        >
+                            Retry
+                        </button>
+                        <button 
+                            onClick={() => window.location.href = '/snippets'}
+                            className="ml-4 px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition-colors"
+                        >
+                            Back to Snippets
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (loading) {
+        console.log("Rendering loading skeleton");
+        return <SnippetLoadingSkeleton />;
+    }
+
+    if (error) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-[#0a0a0f]">
+                <div className="text-center">
+                    <h2 className="text-2xl font-semibold text-white mb-2">
+                        {error === "Snippet not found" ? "Snippet Not Found" : "Error"}
+                    </h2>
+                    <p className="text-gray-400 mb-6">
+                        {error === "Snippet not found" 
+                            ? "The requested snippet could not be found." 
+                            : error === "Invalid snippet ID"
+                                ? "The snippet ID provided is invalid."
+                                : "There was an error loading the snippet. Please try again."}
+                    </p>
+                    <div>
+                        <button 
+                            onClick={() => window.location.reload()}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                        >
+                            Retry
+                        </button>
+                        <button 
+                            onClick={() => window.location.href = '/snippets'}
+                            className="ml-4 px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition-colors"
+                        >
+                            Back to Snippets
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (!snippet) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-[#0a0a0f]">
+                <div className="text-center">
+                    <h2 className="text-2xl font-semibold text-white mb-2">
+                        No Snippet Data
+                    </h2>
+                    <p className="text-gray-400 mb-6">
+                        No data was returned for this snippet.
+                    </p>
+                    <div>
+                        <button 
+                            onClick={() => window.location.reload()}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                        >
+                            Retry
+                        </button>
+                        <button 
+                            onClick={() => window.location.href = '/snippets'}
+                            className="ml-4 px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition-colors"
+                        >
+                            Back to Snippets
+                        </button>
+                    </div>
+>>>>>>> 1aa82f4 (make the change in the price page)
                 </div>
             </div>
         );
@@ -137,7 +342,15 @@ function SnippetDetailPage() {
                     <Comments 
                         snippetId={snippet._id} 
                         comments={comments}
+<<<<<<< HEAD
                         onCommentAdded={(newComment) => setComments(prev => [...prev, newComment])}
+=======
+                        onCommentAdded={(newComment: Comment) => {
+                            if (newComment) {
+                                setComments(prev => [...prev, newComment]);
+                            }
+                        }}
+>>>>>>> 1aa82f4 (make the change in the price page)
                     />
                 </div>
             </main>

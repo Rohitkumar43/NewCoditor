@@ -9,10 +9,18 @@ import { Comment as CommentType } from "@/types/index";
 
 interface CommentsProps {
   snippetId: string;
+<<<<<<< HEAD
   initialComments: CommentType[];
 }
 
 function Comments({ snippetId, initialComments }: CommentsProps) {
+=======
+  comments: CommentType[];
+  onCommentAdded?: (newComment: CommentType) => void;
+}
+
+function Comments({ snippetId, comments: initialComments, onCommentAdded }: CommentsProps) {
+>>>>>>> 1aa82f4 (make the change in the price page)
   const { user } = useUser();
   const [comments, setComments] = useState<CommentType[]>(initialComments);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,8 +31,24 @@ function Comments({ snippetId, initialComments }: CommentsProps) {
 
     try {
       const newComment = await snippetApi.addComment(snippetId, content);
+<<<<<<< HEAD
       setComments(prev => [...prev, newComment]);
       toast.success("Comment added successfully");
+=======
+      
+      if (newComment) {
+        setComments(prev => [...prev, newComment]);
+        
+        // Call the onCommentAdded callback if provided
+        if (onCommentAdded) {
+          onCommentAdded(newComment);
+        }
+        
+        toast.success("Comment added successfully");
+      } else {
+        toast.error("Failed to add comment");
+      }
+>>>>>>> 1aa82f4 (make the change in the price page)
     } catch (error) {
       console.error("Error adding comment:", error);
       toast.error("Something went wrong");

@@ -22,10 +22,15 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import { snippetApi } from "@/services/snippetApi";
 import StarButton from "@/Components/StarButton";
+<<<<<<< HEAD
+=======
+import { useRouter } from "next/navigation";
+>>>>>>> 1aa82f4 (make the change in the price page)
 
 function SnippetCard({ snippet }: { snippet: Snippet }) {
   const { userId } = useAuth();
   const [isDeleting, setIsDeleting] = useState(false);
+<<<<<<< HEAD
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -36,6 +41,23 @@ function SnippetCard({ snippet }: { snippet: Snippet }) {
     } catch (error) {
       console.error("Error deleting snippet:", error);
       toast.error("Error deleting snippet");
+=======
+  const router = useRouter();
+
+  const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete this snippet?")) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const success = await snippetApi.deleteSnippet(snippet._id);
+      if (success) {
+        router.refresh(); // Refresh the page to update the list
+      }
+    } catch (error) {
+      console.error("Error deleting snippet:", error);
+>>>>>>> 1aa82f4 (make the change in the price page)
     } finally {
       setIsDeleting(false);
     }
@@ -83,6 +105,7 @@ function SnippetCard({ snippet }: { snippet: Snippet }) {
                 </div>
               </div>
 
+<<<<<<< HEAD
               <div className="absolute top-5 right-5 z-10 flex gap-4 items-center"
                 onClick={(e) => e.preventDefault()}>
                 <StarButton snippetId={snippet._id} />
@@ -105,10 +128,29 @@ function SnippetCard({ snippet }: { snippet: Snippet }) {
                       )}
                     </button>
                   </div>
+=======
+              {/* Actions */}
+              <div className="flex items-center gap-2">
+                <StarButton snippetId={snippet._id} />
+                {userId === snippet.userId && (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleDelete();
+                    }}
+                    disabled={isDeleting}
+                    className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 
+                      transition-colors duration-200"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+>>>>>>> 1aa82f4 (make the change in the price page)
                 )}
               </div>
             </div>
 
+<<<<<<< HEAD
             <div className="space-y-4">
               <div>
                 <h2 className="text-xl font-semibold text-white mb-2 line-clamp-1 group-hover:text-blue-400 transition-colors">
@@ -130,6 +172,17 @@ function SnippetCard({ snippet }: { snippet: Snippet }) {
                   {snippet.code}
                 </pre>
               </div>
+=======
+            {/* Snippet Title */}
+            <h3 className="text-lg font-semibold text-gray-200 mb-2">
+              {snippet.title}
+            </h3>
+
+            {/* Author Info */}
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <User className="size-4" />
+              <span>{snippet.userName}</span>
+>>>>>>> 1aa82f4 (make the change in the price page)
             </div>
           </div>
         </div>

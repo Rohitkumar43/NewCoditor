@@ -19,6 +19,7 @@ function CommentContent({ content }: CommentContentProps) {
   }
 
   return (
+<<<<<<< HEAD
     <ReactMarkdown
       className="text-[#e1e1e3] prose prose-invert max-w-none"
       components={{
@@ -43,6 +44,33 @@ function CommentContent({ content }: CommentContentProps) {
     >
       {content}
     </ReactMarkdown>
+=======
+    <div className="text-[#e1e1e3] prose prose-invert max-w-none">
+      <ReactMarkdown
+        components={{
+          code: ({ node, inline, className, children, ...props }: any) => {
+            const match = /language-(\w+)/.exec(className || '');
+            return !inline && match ? (
+              <SyntaxHighlighter
+                style={vscDarkPlus as any}
+                language={match[1]}
+                PreTag="div"
+                {...props}
+              >
+                {String(children).replace(/\n$/, '')}
+              </SyntaxHighlighter>
+            ) : (
+              <code className={className} {...props}>
+                {children}
+              </code>
+            );
+          },
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
+>>>>>>> 1aa82f4 (make the change in the price page)
   );
 }
 
